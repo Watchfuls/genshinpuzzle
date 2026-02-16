@@ -80,39 +80,41 @@ serve(async (req) => {
       }
 
       // 2a) Count/pick pool: prefer 'Daily', fallback to NULL (unassigned)
-      type PoolPick = { pool: "Daily" | null; count: number };
-
-      const poolsToTry: PoolPick[] = [
-        { pool: "Daily", count: 0 },
-        { pool: null, count: 0 },
-      ];
+      const poolsToTry: Array<"Daily" | null> = ["Daily", null];
 
       let pickedPool: "Daily" | null = null;
       let nUnused = 0;
 
-      for (const p of poolsToTry) {
-        const q = admin
+      for (const pool of poolsToTry) {
+        let q = admin
           .from("dummy_submissions")
           .select("id", { count: "exact", head: true })
           .is("featured_date", null);
 
-        const { count, error } =
-          p.pool === null ? await q.is("puzzle_pool", null) : await q.eq("puzzle_pool", p.pool);
+        q = pool === null ? q.is("puzzle_pool", null) : q.eq("puzzle_pool", pool);
+
+        const { count, error } = await q;
 
         if (error) {
-          return new Response("dummy_submissions unused count failed", { status: 500, headers: corsHeaders });
+          return new Response("dummy_submissions unused count failed", {
+            status: 500,
+            headers: corsHeaders,
+          });
         }
 
         const n = count ?? 0;
         if (n > 0) {
-          pickedPool = p.pool;
+          pickedPool = pool;
           nUnused = n;
           break;
         }
       }
 
       if (nUnused === 0) {
-        return new Response("No unused submissions left", { status: 404, headers: corsHeaders });
+        return new Response("No unused submissions left", {
+          status: 404,
+          headers: corsHeaders,
+        });
       }
 
       // 2b) Random offset within chosen pool
@@ -124,7 +126,10 @@ serve(async (req) => {
         .select("id")
         .is("featured_date", null);
 
-      pickQuery = pickedPool === null ? pickQuery.is("puzzle_pool", null) : pickQuery.eq("puzzle_pool", "Daily");
+      pickQuery =
+        pickedPool === null
+          ? pickQuery.is("puzzle_pool", null)
+          : pickQuery.eq("puzzle_pool", pickedPool);
 
       const { data: pick, error: pickErr } = await pickQuery
         .order("id", { ascending: true })
@@ -132,8 +137,14 @@ serve(async (req) => {
         .maybeSingle();
 
       if (pickErr || !pick?.id) {
-        return new Response("Failed to pick unused submission", { status: 500, headers: corsHeaders });
+        return new Response("Failed to pick unused submission", {
+          status: 500,
+          headers: corsHeaders,
+        });
       }
+
+      // IMPORTANT: set submissionId to the picked id
+      submissionId = String(pick.id);
 
       // 2d) Insert today's daily row first (race-safe)
       const { error: insErr } = await admin
@@ -145,7 +156,7 @@ serve(async (req) => {
         const { data: retryDaily, error: retryErr } = await admin
           .from("daily_guesser")
           .select("submission_id")
-          .eq("date", today)
+          .eq("date", dateWanted)
           .maybeSingle();
 
         if (retryErr || !retryDaily?.submission_id) {
@@ -170,6 +181,7 @@ serve(async (req) => {
           });
         }
       }
+
     }
 
     const { data: prevRow } = await admin
