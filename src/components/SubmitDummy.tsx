@@ -126,8 +126,14 @@ export default function SubmitDummy() {
 
     if (!f) return;
 
-    if (f.type !== "image/png") {
-      setFileError("Only PNG files are allowed.");
+    const isPng = f.type === "image/png" || f.name.toLowerCase().endsWith(".png");
+    const isJpeg =
+      f.type === "image/jpeg" ||
+      f.name.toLowerCase().endsWith(".jpg") ||
+      f.name.toLowerCase().endsWith(".jpeg");
+
+    if (!isPng && !isJpeg) {
+      setFileError("Only PNG and JPEG files are allowed.");
       return;
     }
 
@@ -173,7 +179,7 @@ export default function SubmitDummy() {
       form.append("r2", refinements[2] ?? DEFAULT_R);
       form.append("r3", refinements[3] ?? DEFAULT_R);
 
-      const elements = preview.map((name) => (name ? CHARACTER_DATA[name].element : "None"));
+      const elements = preview.map((name) => (name ? (CHARACTER_DATA[name]?.element ?? "None") : "None"));
 
       form.append("elements", JSON.stringify(elements));
 
@@ -525,7 +531,8 @@ export default function SubmitDummy() {
                 .filter((entry) => {
                   const data = entry[1];
                   if (filterMode === "all") return true;
-                  return activeElements[data.element as Element];
+                  if (data.element === "None") return false;
+                  return activeElements[data.element];
                 })
                 .map(([name]) => (
                   <button
@@ -562,7 +569,7 @@ export default function SubmitDummy() {
             <h3 style={{ marginTop: 0 }}>Submit a Dummy</h3>
 
             <div style={{ marginBottom: 12, opacity: 0.9 }}>
-              Upload a PNG screenshot (≤ 1MB) and select the 4-character team shown. Please edit the
+              Upload a PNG/JPEG screenshot (≤ 1MB) and select the 4-character team shown. Please edit the
               image to hide the characters, and strongest hit as shown. <br></br>For
               Constellations and Refinements, if the value is "Hidden" it will not be shown to the
               player, only include these if you think these values are abnormal and important for
@@ -585,10 +592,10 @@ export default function SubmitDummy() {
 
             {/* File picker */}
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>Screenshot (PNG only)</div>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>Screenshot (PNG/JPEG only)</div>
               <input
                 type="file"
-                accept="image/png"
+                accept="image/png,image/jpeg"
                 onChange={(e) => onPickFile(e.target.files?.[0] ?? null)}
               />
               {file && !fileError && (

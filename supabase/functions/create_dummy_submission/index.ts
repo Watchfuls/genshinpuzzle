@@ -48,14 +48,9 @@ serve(async (req) => {
     const form = await req.formData();
 
     const file = form.get("image");
+
     if (!(file instanceof File)) {
       return new Response("Missing image", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-    if (file.type !== "image/png") {
-      return new Response("Only PNG allowed", {
         status: 400,
         headers: corsHeaders,
       });
@@ -66,6 +61,33 @@ serve(async (req) => {
         headers: corsHeaders,
       });
     }
+
+    // Allow PNG or JPEG
+    const nameLower = file.name?.toLowerCase?.() ?? "";
+    const isPng = file.type === "image/png" || nameLower.endsWith(".png");
+    const isJpeg =
+      file.type === "image/jpeg" ||
+      nameLower.endsWith(".jpg") ||
+      nameLower.endsWith(".jpeg");
+
+    // Some clients may send file.type as "" — extension fallback covers that.
+    if (!isPng && !isJpeg) {
+      return new Response("Only PNG and JPEG allowed", {
+        status: 400,
+        headers: corsHeaders,
+      });
+    }
+
+    if (file.size > MAX_BYTES) {
+      return new Response("File too large", {
+        status: 400,
+        headers: corsHeaders,
+      });
+    }
+
+    // Determine canonical upload type + extension
+    const uploadContentType = isPng ? "image/png" : "image/jpeg";
+    const ext = isPng ? "png" : "jpg";
 
     const team0 = form.get("team0");
     const team1 = form.get("team1");
@@ -241,11 +263,11 @@ serve(async (req) => {
     }
 
     const submissionId = String(inserted.id);
-    const path = `${submissionId}.png`;
+    const path = `${submissionId}.${ext}`;
 
     const arrayBuf = await file.arrayBuffer();
     const { error: uploadErr } = await admin.storage.from(BUCKET).upload(path, arrayBuf, {
-      contentType: "image/png",
+      contentType: uploadContentType,
       upsert: false,
     });
 

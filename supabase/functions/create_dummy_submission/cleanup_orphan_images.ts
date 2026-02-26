@@ -43,7 +43,8 @@ while (true) {
 
   for (const f of files) {
     // Only consider top-level pngs like "123.png"
-    if (!f.name.endsWith(".png")) continue;
+    const lower = f.name.toLowerCase();
+    if (!lower.endsWith(".png") && !lower.endsWith(".jpg") && !lower.endsWith(".jpeg")) continue;
 
     if (!referenced.has(f.name)) {
       toDelete.push(f.name);
