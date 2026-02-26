@@ -598,6 +598,12 @@ export const CHARACTER_DATA: Record<
     iconUrl: asset("/icons/characters/Varesa_Icon.webp"),
     releaseDate: "2025-03-26",
   },
+  Varka: {
+    name: "Varka",
+    element: "Anemo",
+    iconUrl: asset("/icons/characters/Varka_Icon.webp"),
+    releaseDate: "2026-02-25",
+  },
   Venti: {
     name: "Venti",
     element: "Anemo",
