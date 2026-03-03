@@ -112,6 +112,8 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
     ),
   );
 
+  const { hideKofi, setHideKofi } = useSettings();
+
   const [showShare, setShowShare] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
@@ -632,8 +634,8 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
   const displaySlots = isGameOver ? answerPreview : preview;
 
   const correctCharacters = new Set<string>();
-  const wrongCharacters = new Set<string>(); // GRAY only
-  const guessedNotGreen = new Set<string>(); // YELLOW + GRAY
+  const yellowCharacters = new Set<string>(); // element-correct, wrong character
+  const wrongCharacters = new Set<string>();  // fully wrong (GRAY)
 
   state.guessesSoFar.forEach((guess, i) => {
     guess.characters.forEach((char, j) => {
@@ -641,19 +643,30 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
 
       if (tile === "GREEN") {
         correctCharacters.add(char);
-        guessedNotGreen.delete(char); // if it becomes green later, remove from darkened set
+        yellowCharacters.delete(char);
         wrongCharacters.delete(char);
         return;
       }
 
-      if (tile === "GRAY") wrongCharacters.add(char);
-      if (tile === "YELLOW" || tile === "GRAY") guessedNotGreen.add(char);
+      if (tile === "YELLOW") {
+        if (!correctCharacters.has(char)) {
+          yellowCharacters.add(char);
+          wrongCharacters.delete(char); // yellow wins over gray
+        }
+        return;
+      }
+
+      // tile === "GRAY" (or anything else treated as wrong)
+      if (!correctCharacters.has(char) && !yellowCharacters.has(char)) {
+        wrongCharacters.add(char);
+      }
     });
   });
 
   const getGridBg = (name: string) => {
     if (correctCharacters.has(name)) return "#2f6f3a";
-    if (guessedNotGreen.has(name)) return "#1f1f1f";
+    if (yellowCharacters.has(name)) return "#7a6a2b"; // match your guess tile yellow
+    if (wrongCharacters.has(name)) return "#1f1f1f";
     return "#2a2a2a";
   };
 
@@ -1234,22 +1247,25 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
                   if (filterMode === "all") return true;
                   return activeElements[data.element as Element];
                 })
-                .map(([name]) => (
-                  <button
-                    key={name}
-                    onClick={() => addToPreview(name)}
-                    disabled={isGameOver}
-                    title={name}
-                    style={{
-                      width: 64,
-                      height: 64,
-                      padding: 4,
-                      borderRadius: 6,
-                      border: "1px solid #444",
-                      background: getGridBg(name),
-                      cursor: "pointer",
-                    }}
-                  >
+                .map(([name]) => {
+                  const isFaded = wrongCharacters.has(name) || yellowCharacters.has(name);
+                  
+                  return (               
+                    <button
+                      key={name}
+                      onClick={() => addToPreview(name)}
+                      disabled={isGameOver}
+                      title={name}
+                      style={{
+                        width: 64,
+                        height: 64,
+                        padding: 4,
+                        borderRadius: 6,
+                        border: "1px solid #444",
+                        background: getGridBg(name),
+                        cursor: "pointer",
+                      }}
+                    >
                     <img
                       src={CHARACTER_DATA[name].iconUrl}
                       alt={name}
@@ -1257,12 +1273,13 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
                         width: "100%",
                         height: "100%",
                         objectFit: "contain",
-                        opacity: guessedNotGreen.has(name) ? 0.25 : 1,
-                        filter: guessedNotGreen.has(name) ? "grayscale(0.6)" : "none",
+                        opacity: isFaded ? 0.25 : 1,
+                        filter: isFaded ? "grayscale(0.6)" : "none",
                       }}
                     />
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
             </div>
           </div>
 
@@ -1641,6 +1658,78 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
               </div>
             )}            
           </div>
+
+          <div style={{ width: 320, flexShrink: 0 }}>
+            {/* THIRD COLUMN */}
+            <div style={{                   marginTop: "1rem",
+                  marginBottom: "0.75rem",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 12,}}>
+              <button
+                type="button"
+                onClick={() => setHideKofi(!hideKofi)}
+                style={{
+
+                  border: "1px solid #444",
+                  borderRadius: 10,
+                  padding: "6px 14px",
+                  background: "#1f1f1f",
+                  fontSize: 13,
+                  opacity: 0.95,
+                  userSelect: "none",
+                  minWidth: 130,
+                  height: 32,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+
+
+
+
+
+                  //height: 40,
+                  //padding: "0 14px",
+                  //borderRadius: 6,
+                  //border: "1px solid #444",
+                  //background: "#1f1f1f",
+                  color: !hideKofi ? "rgba(255,255,255,0.8)" : "#fff",
+                
+                  cursor: "pointer",
+                  //minWidth: 120,
+                }}
+              >
+                {hideKofi ? "Show Ko-fi" : "Hide Ko-fi"}
+              </button>
+            </div>
+
+            {!hideKofi && (
+              <div style={{ width: 320, flexShrink: 0 }}>
+                <div
+                  style={{
+                    border: "1px solid #444",
+                    borderRadius: 10,
+                    background: "#1f1f1f",
+                    padding: 12,
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontWeight: 700 }}>It costs me $25 a month to host the server, any help towards that is appreciated!</div>
+                  </div>
+
+                  <div style={{ marginTop: 10 }}>
+                    <iframe
+                      title="Ko-fi"
+                      src="https://ko-fi.com/watchful/?hidefeed=true&widget=true&embed=true"
+                      style={{ width: "100%", height: 620, border: "none" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
     </div>
