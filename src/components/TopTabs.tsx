@@ -79,7 +79,7 @@ export default function TopTabs({
           >
             Watchful
           </a>
-          <text> | Version 0.9</text>
+          <text> | Version 1.0</text>
           <br></br>
           <text>Conceptualised by </text>
           <a

@@ -64,7 +64,7 @@ serve(async (req) => {
   // 3) fetch one row
   const { data, error } = await admin
     .from("dummy_submissions")
-    .select("id, team, elements, strongest_hit, total_dps, image_path, constellations, refinements, genshin_uid")
+    .select("id, team, elements, strongest_hit, total_dps, image_path, constellations, refinements, genshin_uid, created_at")
     .eq("puzzle_pool", "Endless")
     .order("id", { ascending: true })
     .range(offset, offset)

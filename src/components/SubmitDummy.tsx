@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import TopTabs from "./TopTabs";
 import type { Element } from "../game/types";
 import { CHARACTER_DATA } from "../game/characters";
+import { useSettings } from "../context/SettingsContext";
 
 type Constellation = "Hidden" | "C0" | "C1" | "C2" | "C3" | "C4" | "C5" | "C6";
 type Refinement = "Hidden" | "R0" | "R1" | "R2" | "R3" | "R4" | "R5";
@@ -13,6 +14,7 @@ const DEFAULT_C: Constellation = "Hidden";
 const DEFAULT_R: Refinement = "Hidden";
 
 export default function SubmitDummy() {
+  const { characterOrder } = useSettings();
   const ELEMENTS: Element[] = ["Pyro", "Hydro", "Electro", "Cryo", "Dendro", "Anemo", "Geo"];
 
   /* ================= FILE ================= */
@@ -430,8 +432,11 @@ export default function SubmitDummy() {
                 })}
               </div>
 
-              <div style={{ marginTop: 10, opacity: 0.8, fontSize: 12, textAlign: "center" }}>
-              If your team has constellations on limited 5 ★ characters, or the DPS is way off it's expected amount,<br></br> it will probably get assigned to Endless mode.
+              <div style={{ marginTop: 10, opacity: 0.8, fontSize: 12, textAlign: "left" }}>
+              If your team has:<br></br>
+              - Constellations on limited 5 ★ characters, other than Temper C1's<br></br>
+              - You set weapon refinement anything other than R0/Hidden (to represent f2p weapons)<br></br>
+              it will probably get assigned to Endless mode.
               </div>
 
               <button
@@ -528,6 +533,17 @@ export default function SubmitDummy() {
               }}
             >
               {Object.entries(CHARACTER_DATA)
+                .sort(([, a], [, b]) => {
+                  if (characterOrder === "name") {
+                    return a.name.localeCompare(b.name);
+                  }
+
+                  if (a.releaseDate !== b.releaseDate) {
+                    return a.releaseDate.localeCompare(b.releaseDate);
+                  }
+
+                  return a.name.localeCompare(b.name);
+                })
                 .filter((entry) => {
                   const data = entry[1];
                   if (filterMode === "all") return true;

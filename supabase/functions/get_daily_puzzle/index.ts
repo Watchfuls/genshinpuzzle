@@ -207,7 +207,7 @@ serve(async (req) => {
     const { data: row, error: rowErr } = await admin
       .from("dummy_submissions")
       .select(
-        "id, team, elements, strongest_hit, total_dps, image_path, constellations, refinements, genshin_uid",
+        "id, team, elements, strongest_hit, total_dps, image_path, constellations, refinements, genshin_uid, created_at",
       )
       .eq("id", submissionId)
       .maybeSingle();

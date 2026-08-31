@@ -7,6 +7,7 @@ export const initialState: GameState = {
   puzzle: {
     id: "puzzle1",
     version: 1,
+    createdAt: null,
     damageTime: 120,
     strongestHit: 5000,
     totalDps: 20000,

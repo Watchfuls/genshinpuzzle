@@ -5,6 +5,7 @@ import { makeGuess } from "../game/gameController";
 import { CHARACTER_DATA } from "../game/characters";
 import TopTabs from "./TopTabs";
 import { useSettings } from "../context/SettingsContext";
+import { getGenshinVersion } from "../game/genshinVersions";
 
 type Props = { mode?: "daily" | "endless" };
 
@@ -420,6 +421,7 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
             constellations: row.constellations ?? ["Hidden", "Hidden", "Hidden", "Hidden"],
             refinements: row.refinements ?? ["Hidden", "Hidden", "Hidden", "Hidden"],
             genshinUid: row.genshin_uid ?? null,
+            createdAt: row.created_at ?? null,
           },
         };
 
@@ -1438,30 +1440,44 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
               </div>
             )}
 
-            {/* UID */}
-            {state.puzzle.genshinUid && (
-              <div
-                style={{
-                  marginBottom: 12,
-                  fontSize: 13,
-                  opacity: 0.85,
-                }}
-              >
-                UID:{" "}
-                <a
-                  href={`https://enka.network/u/${state.puzzle.genshinUid}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    color: "inherit",
-                    textDecoration: "underline",
-                    fontWeight: "normal",
-                  }}
-                >
-                  {state.puzzle.genshinUid}
-                </a>
+            {/* UID + Version */}
+            <div
+              style={{
+                marginBottom: 12,
+                fontSize: 13,
+                opacity: 0.85,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
+              <div>
+                {state.puzzle.genshinUid && (
+                  <>
+                    UID:{" "}
+                    <a
+                      href={`https://enka.network/u/${state.puzzle.genshinUid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        color: "inherit",
+                        textDecoration: "underline",
+                        fontWeight: "normal",
+                      }}
+                    >
+                      {state.puzzle.genshinUid}
+                    </a>
+                  </>
+                )}
               </div>
-            )}
+
+              {state.puzzle.createdAt && (
+                <div>
+                  Submitted in Version: {getGenshinVersion(state.puzzle.createdAt)}
+                </div>
+              )}
+            </div>
 
             {/* Hints */}
             <h3 style={{ marginTop: "1.5rem" }}>Hints</h3>
