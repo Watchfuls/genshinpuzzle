@@ -120,7 +120,15 @@ export const CHARACTER_ELEMENTS: Record<string, Element> = {
   "Yun Jin": "Geo",
   "Zhongli": "Geo",
   "Zibai": "Geo",
-  "Varka": "Anemo"
+  "Varka": "Anemo",
+  "Linnea": "Geo",
+  "Nicole": "Pyro",
+  "Prune": "Anemo",
+  "Lohen": "Cryo",
+  "Sandrone": "Cryo",
+  "Alyosha": "Electro",
+  "Odette": "Cryo",
+  "Traveler (Cryo)": "Cryo"
 };
 
 export function getElementForCharacter(name: string): Element {

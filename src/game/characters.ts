@@ -34,6 +34,12 @@ export const CHARACTER_DATA: Record<
     iconUrl: asset("/icons/characters/Aloy_Icon.webp"),
     releaseDate: "2021-09-01",
   },
+  Alyosha: {
+    name: "Alyosha",
+    element: "Electro",
+    iconUrl: asset("/icons/characters/Alyosha_Icon.webp"),
+    releaseDate: "2026-08-12",
+  },
   Amber: {
     name: "Amber",
     element: "Pyro",
@@ -376,11 +382,23 @@ export const CHARACTER_DATA: Record<
     iconUrl: asset("/icons/characters/Layla_Icon.webp"),
     releaseDate: "2022-11-18",
   },
+  Linnea: {
+    name: "Linnea",
+    element: "Geo",
+    iconUrl: asset("/icons/characters/Linnea_Icon.webp"),
+    releaseDate: "2026-04-08",
+  },
   Lisa: {
     name: "Lisa",
     element: "Electro",
     iconUrl: asset("/icons/characters/Lisa_Icon.webp"),
     releaseDate: "2020-09-28",
+  },
+  Lohen: {
+    name: "Lohen",
+    element: "Cryo",
+    iconUrl: asset("/icons/characters/Lohen_Icon.webp"),
+    releaseDate: "2026-06-09",
   },
   Lynette: {
     name: "Lynette",
@@ -442,6 +460,12 @@ export const CHARACTER_DATA: Record<
     iconUrl: asset("/icons/characters/Neuvillette_Icon.webp"),
     releaseDate: "2023-09-27",
   },
+  Nicole: {
+    name: "Nicole",
+    element: "Pyro",
+    iconUrl: asset("/icons/characters/Nicole_Icon.webp"),
+    releaseDate: "2026-05-20",
+  },
   Nilou: {
     name: "Nilou",
     element: "Hydro",
@@ -460,11 +484,23 @@ export const CHARACTER_DATA: Record<
     iconUrl: asset("/icons/characters/Noelle_Icon.webp"),
     releaseDate: "2020-09-28",
   },
+  Odette: {
+    name: "Odette",
+    element: "Cryo",
+    iconUrl: asset("/icons/characters/Odette_Icon.webp"),
+    releaseDate: "2026-08-12",
+  },
   Ororon: {
     name: "Ororon",
     element: "Electro",
     iconUrl: asset("/icons/characters/Ororon_Icon.webp"),
     releaseDate: "2024-11-20",
+  },
+  Prune: {
+    name: "Prune",
+    element: "Anemo",
+    iconUrl: asset("/icons/characters/Prune_Icon.webp"),
+    releaseDate: "2026-05-20",
   },
   Qiqi: {
     name: "Qiqi",
@@ -489,6 +525,12 @@ export const CHARACTER_DATA: Record<
     element: "Cryo",
     iconUrl: asset("/icons/characters/Rosaria_Icon.webp"),
     releaseDate: "2021-04-06",
+  },
+  Sandrone: {
+    name: "Sandrone",
+    element: "Cryo",
+    iconUrl: asset("/icons/characters/Sandrone_Icon.webp"),
+    releaseDate: "2026-07-01",
   },
   "Sangonomiya Kokomi": {
     name: "Sangonomiya Kokomi",
@@ -561,6 +603,12 @@ export const CHARACTER_DATA: Record<
     element: "Anemo",
     iconUrl: asset("/icons/characters/AnemoTraveler_Icon.png"),
     releaseDate: "2020-09-28",
+  },
+  "Traveler (Cryo)": {
+    name: "Traveler (Cryo)",
+    element: "Cryo",
+    iconUrl: asset("/icons/characters/CryoTraveler_Icon.png"),
+    releaseDate: "2026-08-12",
   },
   "Traveler (Dendro)": {
     name: "Traveler (Dendro)",
