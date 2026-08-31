@@ -5,7 +5,10 @@ export const config = {
 // supabase/functions/create_dummy_submission/index.ts
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { getElementForCharacter } from "../_shared/character_elements.ts";
+import {
+  getElementForCharacter,
+  getCharacterData,
+} from "../_shared/character_elements.ts";
 import type { Element } from "../_shared/character_elements.ts";
 
 const MAX_BYTES = 1_048_576; // 1MB
@@ -17,6 +20,62 @@ const corsHeaders = {
   "access-control-allow-methods": "POST, OPTIONS",
   "access-control-allow-headers": "content-type, apikey, authorization, x-client-info",
 };
+
+function getLevel(value: string, prefix: "C" | "R"): number {
+  if (value === "Hidden") return 0;
+
+  const match = value.match(new RegExp(`^${prefix}(\\d+)$`));
+  if (!match) return 0;
+
+  return Number(match[1]);
+}
+
+function determineSubmissionMode(
+  team: string[],
+  constellations: string[],
+  refinements: string[],
+): "Daily" | "Endless" {
+  for (let i = 0; i < team.length; i++) {
+    const character = team[i];
+    const data = getCharacterData(character);
+
+    // Should already have been caught by character validation.
+    if (!data) {
+      return "Endless";
+    }
+
+    const constellation = getLevel(constellations[i], "C");
+    const refinement = getLevel(refinements[i], "R");
+
+    // Any weapon above R0 -> Endless
+    if (refinement > 0) {
+      return "Endless";
+    }
+
+    // 4-stars can have any constellation
+    if (data.rarity === 4) {
+      continue;
+    }
+
+    // Standard 5-stars can have any constellation
+    if (data.rarity === 5 && data.standard) {
+      continue;
+    }
+
+    // Limited 5-stars:
+    // Normally C0, but Temper characters can be C1
+    if (data.rarity === 5) {
+      const maxAllowedConstellation = data.temper ? 1 : 0;
+
+      if (constellation > maxAllowedConstellation)
+      {
+        return "Endless";
+      }
+    }
+  }
+
+  return "Daily";
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -175,6 +234,12 @@ serve(async (req) => {
       typeof v === "string" && R_ALLOWED.has(v) ? v : "Hidden",
     );
 
+    const submission_mode = determineSubmissionMode(
+      team,
+      constellations,
+      refinements,
+    );
+
     const strongest_hit = Number(strongestHitRaw);
     const total_dps = Number(totalDpsRaw);
     if (!Number.isFinite(strongest_hit) || strongest_hit <= 0) {
@@ -245,6 +310,7 @@ serve(async (req) => {
         elements: elementsTyped,
         constellations,
         refinements,
+        puzzle_pool: submission_mode,
       })
       .select("id")
       .single();

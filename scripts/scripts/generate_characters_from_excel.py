@@ -21,11 +21,14 @@ ELEMENTS = {"Pyro", "Hydro", "Electro", "Cryo", "Dendro", "Anemo", "Geo"}
 
 @dataclass(frozen=True)
 class Row:
-  key: str          # object key in TS map
-  name: str         # displayed name field
+  key: str
+  name: str
   element: str
-  release_iso: str  # YYYY-MM-DD
+  release_iso: str
   icon_path: str
+  rarity: int
+  standard: bool
+  temper: bool
 
 
 def parse_release_date(v) -> str:
@@ -77,6 +80,9 @@ def main() -> None:
     name_i = header.index("name")
     elem_i = header.index("element")
     date_i = header.index("releasedate")
+    rarity_i = header.index("rarity")
+    standard_i = header.index("standard")
+    temper_i = header.index("temper")
   except ValueError:
     raise SystemExit(f"Expected headers name/element/releasedate, got: {header}")
 
@@ -87,6 +93,9 @@ def main() -> None:
     name = (r[name_i].value or "").strip()
     elem = (r[elem_i].value or "").strip()
     rel = parse_release_date(r[date_i].value)
+    rarity = int(r[rarity_i].value or 0)
+    standard = bool(r[standard_i].value)
+    temper = bool(r[temper_i].value)
 
     if not name:
       continue
@@ -107,6 +116,9 @@ def main() -> None:
       element=elem,
       release_iso=rel,
       icon_path=icon_path_for_key(name),
+      rarity=rarity,
+      standard=standard,
+      temper=temper,
     ))
 
     if elem != "None":
@@ -161,6 +173,56 @@ def main() -> None:
   out2.append('  return CHARACTER_ELEMENTS[name] ?? "None";')
   out2.append("}")
   out2.append("")
+  # ---- Build supabase/functions/_shared/character_elements.ts ----
+
+  # ---- Build supabase/functions/_shared/character_elements.ts ----
+
+  element_union = '"Pyro" | "Hydro" | "Electro" | "Cryo" | "Dendro" | "Anemo" | "Geo" | "None"'
+
+  character_map = {
+    row.name: {
+      "element": row.element,
+      "rarity": row.rarity,
+      "standard": row.standard,
+      "temper": row.temper,
+    }
+    for row in rows
+    if row.element != "None"
+  }
+
+  out2: list[str] = []
+
+  out2.append("// AUTO-GENERATED. DO NOT EDIT.")
+  out2.append("// Generated from characters.xlsx via scripts/generate_characters_from_excel.py")
+  out2.append("")
+
+  out2.append(f"export type Element = {element_union};")
+  out2.append("")
+
+  out2.append("export type CharacterData = {")
+  out2.append("  element: Element;")
+  out2.append("  rarity: number;")
+  out2.append("  standard: boolean;")
+  out2.append("  temper: boolean;")
+  out2.append("};")
+  out2.append("")
+
+  out2.append(
+    f"export const CHARACTER_DATA: Record<string, CharacterData> = "
+    f"{json.dumps(character_map, indent=2)};"
+  )
+  out2.append("")
+
+  out2.append("export function getCharacterData(name: string): CharacterData | null {")
+  out2.append("  return CHARACTER_DATA[name] ?? null;")
+  out2.append("}")
+  out2.append("")
+
+  out2.append("export function getElementForCharacter(name: string): Element {")
+  out2.append('  return CHARACTER_DATA[name]?.element ?? "None";')
+  out2.append("}")
+  out2.append("")
+
 
   OUT_ELEMENTS.parent.mkdir(parents=True, exist_ok=True)
   OUT_ELEMENTS.write_text("\n".join(out2), encoding="utf-8")

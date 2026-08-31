@@ -607,7 +607,7 @@ export const CHARACTER_DATA: Record<
   "Traveler (Cryo)": {
     name: "Traveler (Cryo)",
     element: "Cryo",
-    iconUrl: asset("/icons/characters/CryoTraveler_Icon.png"),
+    iconUrl: asset("/icons/characters/Traveler_(Cryo)_Icon.webp"),
     releaseDate: "2026-08-12",
   },
   "Traveler (Dendro)": {
