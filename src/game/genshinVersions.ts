@@ -2,6 +2,7 @@
 // Generated from the Genshin Impact Wiki Version page.
 
 export const GENSHIN_VERSIONS = [
+  { version: "7.1", startDate: "2026-09-23" },
   { version: "7.0", startDate: "2026-08-12" },
   { version: "6.7", startDate: "2026-07-01" },
   { version: "6.6", startDate: "2026-05-20" },

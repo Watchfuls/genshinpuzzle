@@ -607,7 +607,7 @@ export const CHARACTER_DATA: Record<
   "Traveler (Cryo)": {
     name: "Traveler (Cryo)",
     element: "Cryo",
-    iconUrl: asset("/icons/characters/CryoTraveler_Icon.png"),
+    iconUrl: asset("/icons/characters/Traveler_(Cryo)_Icon.webp"),
     releaseDate: "2026-08-12",
   },
   "Traveler (Dendro)": {
@@ -657,6 +657,18 @@ export const CHARACTER_DATA: Record<
     element: "Anemo",
     iconUrl: asset("/icons/characters/Venti_Icon.webp"),
     releaseDate: "2020-09-28",
+  },
+  Vesna: {
+    name: "Vesna",
+    element: "Anemo",
+    iconUrl: asset("/icons/characters/Vesna_Icon.webp"),
+    releaseDate: "2026-09-23",
+  },
+  Vodyanitsa: {
+    name: "Vodyanitsa",
+    element: "Hydro",
+    iconUrl: asset("/icons/characters/Vodyanitsa_Icon.webp"),
+    releaseDate: "2026-09-23",
   },
   Wanderer: {
     name: "Wanderer",
