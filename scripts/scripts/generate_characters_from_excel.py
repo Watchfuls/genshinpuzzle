@@ -53,7 +53,7 @@ def parse_release_date(v) -> str:
 
 def icon_path_for_key(key: str) -> str:
   # Special-case Traveler (Element) icons (they are .png and use ElementTraveler naming)
-  m = re.fullmatch(r"Traveler\s*\((Anemo|Geo|Electro|Dendro|Hydro|Pyro)\)", key)
+  m = re.fullmatch(r"Traveler\s*\((Anemo|Geo|Electro|Dendro|Hydro|Pyro|Cryo)\)", key)
   if m:
     el = m.group(1)
     return f"/icons/characters/{el}Traveler_Icon.png"
