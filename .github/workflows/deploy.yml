@@ -18,11 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
-        with:
-          repository: Watchfuls/genshin-shared
-          ref: main
-          path: .shared-assets
+      - run: git clone --depth 1 --branch main https://github.com/Watchfuls/genshin-shared.git .shared-assets
       - uses: actions/setup-node@v4
         with:
           node-version: 22
