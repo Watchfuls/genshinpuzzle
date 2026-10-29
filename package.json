@@ -4,8 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "node scripts/prepare-shared-assets.mjs",
     "dev": "vite",
+    "postdev": "node scripts/prepare-shared-assets.mjs clean",
+    "prebuild": "node scripts/prepare-shared-assets.mjs",
     "build": "tsc && vite build",
+    "postbuild": "node scripts/prepare-shared-assets.mjs clean",
     "rebuild": "rm -rf node_modules && rm -rf dist && deno install && deno task prepare && deno task build",
     "lint": "oxlint --fix .",
     "format": "oxfmt .",

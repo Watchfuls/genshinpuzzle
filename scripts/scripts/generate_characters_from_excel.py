@@ -159,29 +159,58 @@ def main() -> None:
   OUT_CHARACTERS.parent.mkdir(parents=True, exist_ok=True)
   OUT_CHARACTERS.write_text("\n".join(lines), encoding="utf-8")
 
+
   # ---- Build supabase/functions/_shared/character_elements.ts ----
   element_union = '"Pyro" | "Hydro" | "Electro" | "Cryo" | "Dendro" | "Anemo" | "Geo" | "None"'
+
   out2: list[str] = []
   out2.append("// AUTO-GENERATED. DO NOT EDIT.")
   out2.append("// Generated from characters.xlsx via scripts/generate_characters_from_excel.py")
   out2.append("")
   out2.append(f"export type Element = {element_union};")
   out2.append("")
-  out2.append(f"export const CHARACTER_ELEMENTS: Record<string, Element> = {json.dumps(element_map, indent=2)};")
+  out2.append("export type CharacterData = {")
+  out2.append("  element: Element;")
+  out2.append("  rarity: number;")
+  out2.append("  standard: boolean;")
+  out2.append("  temper: boolean;")
+  out2.append("};")
   out2.append("")
-  out2.append("export function getElementForCharacter(name: string): Element {")
-  out2.append('  return CHARACTER_ELEMENTS[name] ?? "None";')
+
+  character_data = {
+      row.name: {
+          "element": row.element,
+          "rarity": row.rarity,
+          "standard": row.standard,
+          "temper": row.temper,
+      }
+      for row in rows
+  }
+
+  out2.append(
+      "export const CHARACTER_DATA: Record<string, CharacterData> = "
+      + json.dumps(character_data, indent=2)
+      + ";"
+  )
+  out2.append("")
+
+  out2.append("export function getCharacterData(name: string): CharacterData | null {")
+  out2.append("  return CHARACTER_DATA[name] ?? null;")
   out2.append("}")
   out2.append("")
 
-
+  out2.append("export function getElementForCharacter(name: string): Element {")
+  out2.append('  return CHARACTER_DATA[name]?.element ?? "None";')
+  out2.append("}")
+  out2.append("")
 
   OUT_ELEMENTS.parent.mkdir(parents=True, exist_ok=True)
   OUT_ELEMENTS.write_text("\n".join(out2), encoding="utf-8")
 
   print(f"Wrote {OUT_CHARACTERS}")
-  print(f"Wrote {OUT_ELEMENTS} ({len(element_map)} entries)")
+  print(f"Wrote {OUT_ELEMENTS} ({len(character_data)} entries)")
 
 
 if __name__ == "__main__":
-  main()
+    main()
+
