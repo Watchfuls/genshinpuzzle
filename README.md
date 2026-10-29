@@ -32,6 +32,10 @@ folder. `npm run dev` and `npm run build` copy them into the ignored
 `public/icons/` build input. Set `GENSHIN_SHARED_DIR` to override that path.
 GitHub Actions checks out `Watchfuls/genshin-shared` before building.
 
+For GitHub Pages builds, add `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_ANON_KEY` as repository Actions secrets. These are required for
+the deployed app to load daily and endless puzzles.
+
 ## GitHub Pages deployment
 
 Set Settings → Pages → Source to **GitHub Actions**. The workflow deploys on
