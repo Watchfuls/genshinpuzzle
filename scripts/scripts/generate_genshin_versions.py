@@ -42,7 +42,7 @@ def fetch_rendered_page():
         },
     )
 
-    with urllib.request.urlopen(request) as response:
+    with urllib.request.urlopen(request, timeout=20) as response:
         data = json.load(response)
 
     return data["parse"]["text"]
