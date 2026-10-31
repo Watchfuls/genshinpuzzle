@@ -93,6 +93,8 @@ serve(async () => {
     const { data: submissions, error } = await admin
       .from("dummy_submissions")
       .select("id, team, constellations, refinements")
+      .neq("image_path", "pending")
+      .not("image_path", "is", null)
       .is("puzzle_pool", null)
       .limit(250);
 

@@ -42,6 +42,8 @@ serve(async (req) => {
   const { count, error: countErr } = await admin
     .from("dummy_submissions")
     .select("id", { count: "exact", head: true })
+    .neq("image_path", "pending")
+    .not("image_path", "is", null)
     .eq("puzzle_pool", "Endless");
   if (countErr) {
     return new Response("Count failed", {
@@ -65,6 +67,8 @@ serve(async (req) => {
   const { data, error } = await admin
     .from("dummy_submissions")
     .select("id, team, elements, strongest_hit, total_dps, image_path, constellations, refinements, genshin_uid, created_at")
+    .neq("image_path", "pending")
+    .not("image_path", "is", null)
     .eq("puzzle_pool", "Endless")
     .order("id", { ascending: true })
     .range(offset, offset)

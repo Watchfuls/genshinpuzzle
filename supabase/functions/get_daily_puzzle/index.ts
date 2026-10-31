@@ -89,6 +89,8 @@ serve(async (req) => {
         let q = admin
           .from("dummy_submissions")
           .select("id", { count: "exact", head: true })
+          .neq("image_path", "pending")
+          .not("image_path", "is", null)
           .is("featured_date", null);
 
         q = pool === null ? q.is("puzzle_pool", null) : q.eq("puzzle_pool", pool);
@@ -124,6 +126,8 @@ serve(async (req) => {
       let pickQuery = admin
         .from("dummy_submissions")
         .select("id")
+        .neq("image_path", "pending")
+        .not("image_path", "is", null)
         .is("featured_date", null);
 
       pickQuery =

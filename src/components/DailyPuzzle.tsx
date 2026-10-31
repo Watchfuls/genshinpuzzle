@@ -308,6 +308,9 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
   // =========================================================
 
   useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+
     const load = async () => {
       // Clear UI state immediately when switching date / puzzle
       setLoadError(null);
@@ -332,14 +335,17 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
 
           const res = await fetch(endpoint, {
             method: "GET",
+            signal,
             headers: {
               apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
               Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
             },
           });
+          if (signal.aborted) return;
 
           if (!res.ok) {
             const text = await res.text();
+            if (signal.aborted) return;
             setIsDateLoading(false);
 
             if (!isEndless && res.status === 404 && text.includes("No unused submissions left")) {
@@ -356,6 +362,7 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
           }
 
           const candidate = await res.json();
+          if (signal.aborted) return;
 
           if (!isEndless) {
             row = candidate;
@@ -449,6 +456,7 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
 
         setState(baseState);
       } catch (e) {
+        if (signal.aborted) return;
         setIsDateLoading(false);
         console.error("Failed to load puzzle:", e);
         setLoadError(
@@ -460,6 +468,7 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
     };
 
     load();
+    return () => controller.abort();
   }, [selectedDate, endlessNonce, isEndless, todayUTC, loadTodayRun, clearTodayRun]);
 
   // =========================================================

@@ -28,6 +28,11 @@ body {
   min-height: 100vh;
 }
 
+.related-sites{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:6px;font-size:12px;color:#aaa}
+.related-sites a{font-weight:400;color:inherit;text-decoration:underline;text-underline-offset:2px}
+.related-sites a:hover{color:#eee}
+.related-sites a:focus-visible{outline:2px solid #aaa;outline-offset:4px;border-radius:2px}
+
 
 h1 {
   font-size: 3.2em;

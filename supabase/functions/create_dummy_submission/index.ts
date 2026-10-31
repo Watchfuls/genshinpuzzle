@@ -310,7 +310,8 @@ serve(async (req) => {
         elements: elementsTyped,
         constellations,
         refinements,
-        puzzle_pool: submission_mode,
+        // Publish the pool together with the image path only after upload succeeds.
+        puzzle_pool: null,
       })
       .select("id")
       .single();
@@ -347,10 +348,14 @@ serve(async (req) => {
 
     const { error: updateErr } = await admin
       .from("dummy_submissions")
-      .update({ image_path: path })
+      .update({ image_path: path, puzzle_pool: submission_mode })
       .eq("id", submissionId);
 
     if (updateErr) {
+      const { error: removeErr } = await admin.storage.from(BUCKET).remove([path]);
+      if (removeErr) console.error("Failed to remove unpublished image:", removeErr);
+      const { error: deleteErr } = await admin.from("dummy_submissions").delete().eq("id", submissionId);
+      if (deleteErr) console.error("Failed to remove unpublished submission:", deleteErr);
       return new Response("Update failed", {
         status: 500,
         headers: corsHeaders,

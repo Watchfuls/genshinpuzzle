@@ -43,7 +43,7 @@ export default function TopTabs({
 
   return (
     <div style={{ marginBottom: 32, marginLeft: 32 }}>
-      <div style={{ display: "flex", gap: 32, alignItems: "flex-start" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 32, alignItems: "flex-start" }}>
         <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
           <h2 style={{ margin: 0 }}>{title}</h2>
         </Link>
@@ -91,6 +91,12 @@ export default function TopTabs({
             Zajef77
           </a>
           <text> and Virus34</text>
+        </div>
+
+        <div className="related-sites" role="navigation" aria-label="More Genshin tools">
+          <a href="https://watchfuls.github.io/imaginarium-theater-planner/">Theater Planner</a>
+          <span aria-hidden="true">·</span>
+          <a href="https://watchfuls.github.io/GenshinGraph/">Character Graph</a>
         </div>
 
         {statusText && (
