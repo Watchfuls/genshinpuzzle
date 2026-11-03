@@ -424,6 +424,12 @@ export const CHARACTER_DATA: Record<
     iconUrl: asset("/icons/characters/Mika_Icon.webp"),
     releaseDate: "2023-03-21",
   },
+  Mitya: {
+    name: "Mitya",
+    element: "Electro",
+    iconUrl: asset("/icons/characters/Mitya_Icon.webp"),
+    releaseDate: "2026-11-04",
+  },
   Mona: {
     name: "Mona",
     element: "Hydro",
@@ -639,6 +645,12 @@ export const CHARACTER_DATA: Record<
     element: "Pyro",
     iconUrl: asset("/icons/characters/PyroTraveler_Icon.png"),
     releaseDate: "2025-01-01",
+  },
+  Valeriy: {
+    name: "Valeriy",
+    element: "Electro",
+    iconUrl: asset("/icons/characters/Valeriy_Icon.webp"),
+    releaseDate: "2026-11-04",
   },
   Varesa: {
     name: "Varesa",

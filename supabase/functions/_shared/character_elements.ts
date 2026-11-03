@@ -425,6 +425,12 @@ export const CHARACTER_DATA: Record<string, CharacterData> = {
     "standard": false,
     "temper": false
   },
+  "Mitya": {
+    "element": "Electro",
+    "rarity": 5,
+    "standard": false,
+    "temper": false
+  },
   "Mona": {
     "element": "Hydro",
     "rarity": 5,
@@ -637,6 +643,12 @@ export const CHARACTER_DATA: Record<string, CharacterData> = {
   },
   "Traveler (Pyro)": {
     "element": "Pyro",
+    "rarity": 4,
+    "standard": false,
+    "temper": false
+  },
+  "Valeriy": {
+    "element": "Electro",
     "rarity": 4,
     "standard": false,
     "temper": false
