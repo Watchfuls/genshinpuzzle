@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-type CharacterOrder = "name" | "release";
+export type CharacterOrder = "name" | "name-desc" | "release" | "release-newest" | "game";
 
 type SettingsCookie = {
   autoRevealHints: boolean;

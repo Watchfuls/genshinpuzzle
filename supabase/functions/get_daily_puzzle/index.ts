@@ -70,7 +70,7 @@ serve(async (req) => {
 
     let submissionId: string | null = existingDaily?.submission_id ?? null;
 
-    // (2) If not, pick a random unused submission (featured_date is null) and insert today (REPLACE L62–L119)
+    // (2) Assign atomically with edits/deletes and concurrent requests for this date.
     if (!submissionId) {
       if (dateWanted !== today) {
         return new Response("No puzzle for that date", {
@@ -79,113 +79,22 @@ serve(async (req) => {
         });
       }
 
-      // 2a) Count/pick pool: prefer 'Daily', fallback to NULL (unassigned)
-      const poolsToTry: Array<"Daily" | null> = ["Daily", null];
-
-      let pickedPool: "Daily" | null = null;
-      let nUnused = 0;
-
-      for (const pool of poolsToTry) {
-        let q = admin
-          .from("dummy_submissions")
-          .select("id", { count: "exact", head: true })
-          .neq("image_path", "pending")
-          .not("image_path", "is", null)
-          .is("featured_date", null);
-
-        q = pool === null ? q.is("puzzle_pool", null) : q.eq("puzzle_pool", pool);
-
-        const { count, error } = await q;
-
-        if (error) {
-          return new Response("dummy_submissions unused count failed", {
-            status: 500,
-            headers: corsHeaders,
-          });
-        }
-
-        const n = count ?? 0;
-        if (n > 0) {
-          pickedPool = pool;
-          nUnused = n;
-          break;
-        }
+      const { data: assignedId, error: assignError } = await admin.rpc("assign_daily_puzzle", {
+        p_date: dateWanted,
+      });
+      if (assignError) {
+        return new Response("Daily puzzle assignment failed", {
+          status: 500,
+          headers: corsHeaders,
+        });
       }
-
-      if (nUnused === 0) {
+      if (!assignedId) {
         return new Response("No unused submissions left", {
           status: 404,
           headers: corsHeaders,
         });
       }
-
-      // 2b) Random offset within chosen pool
-      const offset = Math.floor(Math.random() * nUnused);
-
-      // 2c) Fetch one unused row (stable order) from chosen pool
-      let pickQuery = admin
-        .from("dummy_submissions")
-        .select("id")
-        .neq("image_path", "pending")
-        .not("image_path", "is", null)
-        .is("featured_date", null);
-
-      pickQuery =
-        pickedPool === null
-          ? pickQuery.is("puzzle_pool", null)
-          : pickQuery.eq("puzzle_pool", pickedPool);
-
-      const { data: pick, error: pickErr } = await pickQuery
-        .order("id", { ascending: true })
-        .range(offset, offset)
-        .maybeSingle();
-
-      if (pickErr || !pick?.id) {
-        return new Response("Failed to pick unused submission", {
-          status: 500,
-          headers: corsHeaders,
-        });
-      }
-
-      // IMPORTANT: set submissionId to the picked id
-      submissionId = String(pick.id);
-
-      // 2d) Insert today's daily row first (race-safe)
-      const { error: insErr } = await admin
-        .from("daily_guesser")
-        .insert({ date: dateWanted, submission_id: submissionId });
-
-      if (insErr) {
-        // likely unique conflict on date; re-fetch the winner and use it
-        const { data: retryDaily, error: retryErr } = await admin
-          .from("daily_guesser")
-          .select("submission_id")
-          .eq("date", dateWanted)
-          .maybeSingle();
-
-        if (retryErr || !retryDaily?.submission_id) {
-          return new Response("Failed to lock daily puzzle", {
-            status: 500,
-            headers: corsHeaders,
-          });
-        }
-
-        submissionId = String(retryDaily.submission_id);
-      } else {
-        // 2e) Only the request that "won" the insert sets featured_date
-        const { error: featErr } = await admin
-          .from("dummy_submissions")
-          .update({ featured_date: dateWanted })
-          .eq("id", submissionId);
-
-        if (featErr) {
-          return new Response("Failed to set featured_date", {
-            status: 500,
-            headers: corsHeaders,
-          });
-        }
-      }
-
+      submissionId = String(assignedId);
     }
 
     const { data: prevRow } = await admin

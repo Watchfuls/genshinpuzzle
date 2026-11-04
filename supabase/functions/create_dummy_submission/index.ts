@@ -1,375 +1,90 @@
-export const config = {
-  verifyJWT: false,
-};
-
-// supabase/functions/create_dummy_submission/index.ts
+export const config = { verifyJWT: false };
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
-  getElementForCharacter,
-  getCharacterData,
-} from "../_shared/character_elements.ts";
-import type { Element } from "../_shared/character_elements.ts";
-
-const MAX_BYTES = 1_048_576; // 1MB
-const MAX_SUBMISSIONS = 1000;
-const BUCKET = "submission-images";
-
-const corsHeaders = {
-  "access-control-allow-origin": "*", // or your exact site origin
+  BUCKET,
+  createSecret,
+  hashSecret,
+  parseSubmission,
+  readImage,
+  SubmissionError,
+} from "../_shared/submission-data.ts";
+const cors = {
+  "access-control-allow-origin": "*",
   "access-control-allow-methods": "POST, OPTIONS",
   "access-control-allow-headers": "content-type, apikey, authorization, x-client-info",
 };
-
-function getLevel(value: string, prefix: "C" | "R"): number {
-  if (value === "Hidden") return 0;
-
-  const match = value.match(new RegExp(`^${prefix}(\\d+)$`));
-  if (!match) return 0;
-
-  return Number(match[1]);
-}
-
-function determineSubmissionMode(
-  team: string[],
-  constellations: string[],
-  refinements: string[],
-): "Daily" | "Endless" {
-  for (let i = 0; i < team.length; i++) {
-    const character = team[i];
-    const data = getCharacterData(character);
-
-    // Should already have been caught by character validation.
-    if (!data) {
-      return "Endless";
-    }
-
-    const constellation = getLevel(constellations[i], "C");
-    const refinement = getLevel(refinements[i], "R");
-
-    // Any weapon above R0 -> Endless
-    if (refinement > 0) {
-      return "Endless";
-    }
-
-    // 4-stars can have any constellation
-    if (data.rarity === 4) {
-      continue;
-    }
-
-    // Standard 5-stars can have any constellation
-    if (data.rarity === 5 && data.standard) {
-      continue;
-    }
-
-    // Limited 5-stars:
-    // Normally C0, but Temper characters can be C1
-    if (data.rarity === 5) {
-      const maxAllowedConstellation = data.temper ? 1 : 0;
-
-      if (constellation > maxAllowedConstellation)
-      {
-        return "Endless";
-      }
-    }
-  }
-
-  return "Daily";
-}
-
+const json = (value: unknown, status = 200) =>
+  new Response(JSON.stringify(value), {
+    status,
+    headers: { ...cors, "content-type": "application/json" },
+  });
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { status: 200, headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response(null, { headers: cors });
+  if (req.method !== "POST") {
+    return json({ message: "Method not allowed" }, 405);
   }
-
   try {
-    if (req.method !== "POST") {
-      return new Response("Method Not Allowed", {
-        status: 405,
-        headers: corsHeaders,
-      });
+    if (req.headers.get("content-type")?.includes("application/json")) {
+      const body = await req.json();
+      if (body?.action === "capabilities") {
+        return json({ management: true, namedWeapons: true });
+      }
+      throw new SubmissionError("Unsupported action.");
     }
-
-    const contentType = req.headers.get("content-type") ?? "";
-    if (!contentType.toLowerCase().includes("multipart/form-data")) {
-      return new Response("Expected multipart/form-data", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-
-    // Expect multipart/form-data:
-    // - image: PNG file
-    // - team0/team1/team2/team3: character names (strings)
-    // - strongestHit: number (string)
-    // - totalDps: number (string)
-    // - genshinUid: optional string
     const form = await req.formData();
-
-    const file = form.get("image");
-
-    if (!(file instanceof File)) {
-      return new Response("Missing image", {
-        status: 400,
-        headers: corsHeaders,
-      });
+    const payload = parseSubmission(form);
+    const image = (await readImage(form.get("image"), true))!;
+    const url = Deno.env.get("SUPABASE_URL");
+    const key = Deno.env.get("SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !key) {
+      return json({ message: "Server configuration missing" }, 500);
     }
-    if (file.size > MAX_BYTES) {
-      return new Response("File too large", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-
-    // Allow PNG or JPEG
-    const nameLower = file.name?.toLowerCase?.() ?? "";
-    const isPng = file.type === "image/png" || nameLower.endsWith(".png");
-    const isJpeg =
-      file.type === "image/jpeg" ||
-      nameLower.endsWith(".jpg") ||
-      nameLower.endsWith(".jpeg");
-
-    // Some clients may send file.type as "" — extension fallback covers that.
-    if (!isPng && !isJpeg) {
-      return new Response("Only PNG and JPEG allowed", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-
-    if (file.size > MAX_BYTES) {
-      return new Response("File too large", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-
-    // Determine canonical upload type + extension
-    const uploadContentType = isPng ? "image/png" : "image/jpeg";
-    const ext = isPng ? "png" : "jpg";
-
-    const team0 = form.get("team0");
-    const team1 = form.get("team1");
-    const team2 = form.get("team2");
-    const team3 = form.get("team3");
-
-    const c0 = form.get("c0");
-    const c1 = form.get("c1");
-    const c2 = form.get("c2");
-    const c3 = form.get("c3");
-
-    const r0 = form.get("r0");
-    const r1 = form.get("r1");
-    const r2 = form.get("r2");
-    const r3 = form.get("r3");
-
-    const strongestHitRaw = form.get("strongestHit");
-    const totalDpsRaw = form.get("totalDps");
-    const uidRaw = form.get("genshinUid");
-
-    if (
-      typeof team0 !== "string" ||
-      typeof team1 !== "string" ||
-      typeof team2 !== "string" ||
-      typeof team3 !== "string"
-    ) {
-      return new Response("Missing team fields", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-
-    if (typeof strongestHitRaw !== "string") {
-      return new Response("Missing strongestHit", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-    if (typeof totalDpsRaw !== "string") {
-      return new Response("Missing totalDps", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-
-    const team = [team0, team1, team2, team3].map((s) => s.trim());
-
-    if (team.some((s) => !s)) {
-      return new Response("Team fields must be non-empty", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-
-    // Derive elements server-side (do not trust client)
-    const derivedElements = team.map((name) => getElementForCharacter(name));
-    const unknown = team.filter((name, i) => derivedElements[i] === "None");
-
-    // Validate: all characters must be known and have a real element
-    if (unknown.length > 0) {
-      return new Response(`Unknown character(s): ${unknown.join(", ")}`, {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-
-    // If you want strict typing, cast after validation
-    const elementsTyped = derivedElements as Element[];
-
-    if (new Set(team).size !== 4) {
-      return new Response("Team must not contain duplicates", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-
-    const C_ALLOWED = new Set(["Hidden", "C0", "C1", "C2", "C3", "C4", "C5", "C6"]);
-    const R_ALLOWED = new Set(["Hidden", "R0", "R1", "R2", "R3", "R4", "R5"]);
-
-    const constellations = [c0, c1, c2, c3].map((v) =>
-      typeof v === "string" && C_ALLOWED.has(v) ? v : "Hidden",
-    );
-
-    const refinements = [r0, r1, r2, r3].map((v) =>
-      typeof v === "string" && R_ALLOWED.has(v) ? v : "Hidden",
-    );
-
-    const submission_mode = determineSubmissionMode(
-      team,
-      constellations,
-      refinements,
-    );
-
-    const strongest_hit = Number(strongestHitRaw);
-    const total_dps = Number(totalDpsRaw);
-    if (!Number.isFinite(strongest_hit) || strongest_hit <= 0) {
-      return new Response("Invalid strongestHit", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-    if (!Number.isFinite(total_dps) || total_dps <= 0) {
-      return new Response("Invalid totalDps", {
-        status: 400,
-        headers: corsHeaders,
-      });
-    }
-
-    const genshin_uid =
-      typeof uidRaw === "string" && uidRaw.trim().length > 0 ? uidRaw.trim() : null;
-
-    // SUPABASE_URL is available in the Functions runtime
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    if (!supabaseUrl) {
-      return new Response("Missing SUPABASE_URL", {
-        status: 500,
-        headers: corsHeaders,
-      });
-    }
-
-    // Put your service role key in Function env vars as: SERVICE_ROLE_KEY
-    // (avoid SUPABASE_* secret names)
-    const serviceKey =
-      Deno.env.get("SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    if (!serviceKey) {
-      return new Response("Missing SERVICE_ROLE_KEY", {
-        status: 500,
-        headers: corsHeaders,
-      });
-    }
-
-    const admin = createClient(supabaseUrl, serviceKey);
-
-    // Enforce cap
-    const { count, error: countErr } = await admin
+    const admin = createClient(url, key);
+    const { count, error: countError } = await admin
       .from("dummy_submissions")
       .select("id", { count: "exact", head: true });
-
-    if (countErr) {
-      return new Response("Count failed", {
-        status: 500,
-        headers: corsHeaders,
-      });
+    if (countError) throw new Error("Submission count failed");
+    if ((count ?? 0) >= 1000) {
+      return json({ message: "Submissions are closed" }, 403);
     }
-    if ((count ?? 0) >= MAX_SUBMISSIONS) {
-      return new Response("Submissions are closed", {
-        status: 403,
-        headers: corsHeaders,
-      });
-    }
-
-    // Insert row first to get ID
-    const { data: inserted, error: insertErr } = await admin
+    const { data: row, error: insertError } = await admin
       .from("dummy_submissions")
-      .insert({
-        image_path: "pending",
-        team,
-        strongest_hit,
-        total_dps,
-        genshin_uid,
-        elements: elementsTyped,
-        constellations,
-        refinements,
-        // Publish the pool together with the image path only after upload succeeds.
-        puzzle_pool: null,
-      })
+      .insert({ ...payload, image_path: "pending", puzzle_pool: null })
       .select("id")
       .single();
-
-    if (insertErr || !inserted) {
-      return new Response(
-        JSON.stringify({
-          message: "Insert failed",
-          error: insertErr,
-        }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "content-type": "application/json" },
-        },
-      );
+    if (insertError || !row) throw new Error("Submission creation failed");
+    const id = String(row.id);
+    const secret = createSecret();
+    const path = id + "/" + crypto.randomUUID() + "." + image.ext;
+    try {
+      const { error: tokenError } = await admin
+        .from("submission_management")
+        .insert({ submission_id: id, token_hash: await hashSecret(secret) });
+      if (tokenError) throw new Error("Management code creation failed");
+      const { error: uploadError } = await admin.storage
+        .from(BUCKET)
+        .upload(path, image.bytes, { contentType: image.contentType, upsert: false });
+      if (uploadError) throw new Error("Image upload failed");
+      const { error: updateError } = await admin
+        .from("dummy_submissions")
+        .update({ image_path: path, puzzle_pool: payload.puzzle_pool })
+        .eq("id", id);
+      if (updateError) throw new Error("Publishing submission failed");
+    } catch (error) {
+      await admin.storage.from(BUCKET).remove([path]);
+      await admin.from("dummy_submissions").delete().eq("id", id);
+      throw error;
     }
-
-    const submissionId = String(inserted.id);
-    const path = `${submissionId}.${ext}`;
-
-    const arrayBuf = await file.arrayBuffer();
-    const { error: uploadErr } = await admin.storage.from(BUCKET).upload(path, arrayBuf, {
-      contentType: uploadContentType,
-      upsert: false,
-    });
-
-    if (uploadErr) {
-      await admin.from("dummy_submissions").delete().eq("id", submissionId);
-      return new Response("Upload failed", {
-        status: 500,
-        headers: corsHeaders,
-      });
+    return json({ submissionId: id, managementCode: id + "." + secret });
+  } catch (error) {
+    if (error instanceof SubmissionError) {
+      return json({ message: error.message }, error.status);
     }
-
-    const { error: updateErr } = await admin
-      .from("dummy_submissions")
-      .update({ image_path: path, puzzle_pool: submission_mode })
-      .eq("id", submissionId);
-
-    if (updateErr) {
-      const { error: removeErr } = await admin.storage.from(BUCKET).remove([path]);
-      if (removeErr) console.error("Failed to remove unpublished image:", removeErr);
-      const { error: deleteErr } = await admin.from("dummy_submissions").delete().eq("id", submissionId);
-      if (deleteErr) console.error("Failed to remove unpublished submission:", deleteErr);
-      return new Response("Update failed", {
-        status: 500,
-        headers: corsHeaders,
-      });
-    }
-
-    return new Response(JSON.stringify({ submissionId }), {
-      status: 200,
-      headers: { ...corsHeaders, "content-type": "application/json" },
-    });
-  } catch (e) {
-    return new Response(`Server error: ${String(e)}`, {
-      status: 500,
-      headers: corsHeaders,
-    });
+    console.error(
+      "Create submission failed",
+      error instanceof Error ? error.message : "Unknown error",
+    );
+    return json({ message: "Could not save the submission. Please try again." }, 500);
   }
 });

@@ -13,9 +13,8 @@ export function makeGuess(state: GameState, guess: Guess): GameState {
 
   // Update clue unlocks based on lives lost
   const newClueState = { ...state.clueState };
-  newClueState.constellationsRefinementsUnlocked = true;
   if (livesLost >= 1) newClueState.strongestHitUnlocked = true;
-  if (livesLost >= 2) newClueState.elementsUnlocked = true;
+  if (livesLost >= 4) newClueState.elementsUnlocked = true;
 
   return {
     ...state,

@@ -2,59 +2,41 @@ import TopTabs from "./TopTabs";
 import { useSettings } from "../context/SettingsContext";
 
 export default function OptionsPage() {
-  const {
-    autoRevealHints,
-    characterOrder,
-    hideKofi,          // NEW
-    setAutoRevealHints,
-    setCharacterOrder,
-    setHideKofi,       // NEW
-  } = useSettings();
-
+  const { autoRevealHints, hideKofi, setAutoRevealHints, setHideKofi } = useSettings();
   return (
-    <div style={{ minHeight: "100vh" }}>
+    <>
       <TopTabs />
-      <div style={{ paddingLeft: 32 }}>
-        <h2>Options</h2>
-
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: "flex", gap: 12, alignItems: "center" }}>
+      <main className="simple-page">
+        <span className="eyebrow">Make it yours</span>
+        <h1>Options</h1>
+        <p className="panel-note">Your preferences are saved in this browser.</p>
+        <div className="setting-row">
+          <label>
+            <span>
+              <strong>Automatically reveal hints</strong>
+              <p>Show each clue as soon as it becomes available.</p>
+            </span>
             <input
               type="checkbox"
               checked={autoRevealHints}
               onChange={(e) => setAutoRevealHints(e.target.checked)}
             />
-            Auto-Reveal Hints
           </label>
         </div>
-
-        {/* NEW: Hide Ko-fi */}
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <div className="setting-row">
+          <label>
+            <span>
+              <strong>Hide support options</strong>
+              <p>Keep the Ko-fi panel out of your game.</p>
+            </span>
             <input
               type="checkbox"
               checked={hideKofi}
               onChange={(e) => setHideKofi(e.target.checked)}
             />
-            Hide Ko-fi
           </label>
         </div>
-
-        <div>
-          <label>
-            Character Layout Order
-            <br />
-            <select
-              value={characterOrder}
-              onChange={(e) => setCharacterOrder(e.target.value as "name" | "release")}
-              style={{ marginTop: 8, height: 32 }}
-            >
-              <option value="name">By Name</option>
-              <option value="release">By Release Date</option>
-            </select>
-          </label>
-        </div>
-      </div>
-    </div>
+      </main>
+    </>
   );
 }

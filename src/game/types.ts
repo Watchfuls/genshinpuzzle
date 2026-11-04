@@ -27,16 +27,19 @@ export interface Guess {
 
 export type TileState = "GREEN" | "YELLOW" | "GRAY";
 
+export type ChoiceClue = "weapons" | "regions" | "releasePatch";
+
 export interface ClueState {
+  choiceClues: [ChoiceClue | null, ChoiceClue | null];
+  weaponsUnlocked: boolean;
+  weaponsRevealed: boolean;
+  regionsUnlocked: boolean;
+  regionsRevealed: boolean;
   strongestHitUnlocked: boolean;
-  totalDpsUnlocked: boolean;
   elementsUnlocked: boolean;
-  constellationsRefinementsUnlocked: boolean;
 
   strongestHitRevealed: boolean;
-  totalDpsRevealed: boolean;
   elementsRevealed: boolean;
-  constellationsRefinementsRevealed: boolean;
 }
 
 export interface GameState {

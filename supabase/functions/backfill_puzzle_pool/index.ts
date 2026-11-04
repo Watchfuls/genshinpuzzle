@@ -3,86 +3,19 @@ export const config = { verifyJWT: false };
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-import {
-  getCharacterData,
-} from "../_shared/character_elements.ts";
-
-function getLevel(value: string, prefix: "C" | "R"): number {
-  if (value === "Hidden") return 0;
-
-  const match = value.match(new RegExp(`^${prefix}(\\d+)$`));
-  if (!match) return 0;
-
-  return Number(match[1]);
-}
-
-function determineSubmissionMode(
-  team: string[],
-  constellations: string[],
-  refinements: string[],
-): "Daily" | "Endless" {
-  for (let i = 0; i < team.length; i++) {
-    const character = team[i];
-    const data = getCharacterData(character);
-
-    if (!data) {
-      console.warn(`Unknown character: ${character}`);
-      return "Endless";
-    }
-
-    const constellation = getLevel(
-      constellations[i] ?? "Hidden",
-      "C",
-    );
-
-    const refinement = getLevel(
-      refinements[i] ?? "Hidden",
-      "R",
-    );
-
-    // Any weapon above R0
-    if (refinement > 0) {
-      return "Endless";
-    }
-
-    // 4-stars can use any constellation
-    if (data.rarity === 4) {
-      continue;
-    }
-
-    // Standard 5-stars can use any constellation
-    if (data.rarity === 5 && data.standard) {
-      continue;
-    }
-
-    // Limited 5-stars
-    if (data.rarity === 5) {
-      const maxAllowedConstellation = data.temper ? 1 : 0;
-
-      if (constellation > maxAllowedConstellation) {
-        return "Endless";
-      }
-    }
-  }
-
-  return "Daily";
-}
+import { determinePool } from "../_shared/submission-data.ts";
 
 serve(async () => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
   if (!supabaseUrl || !serviceRoleKey) {
-    return new Response(
-      JSON.stringify({ error: "Missing Supabase environment variables" }),
-      { status: 500 },
-    );
+    return new Response(JSON.stringify({ error: "Missing Supabase environment variables" }), {
+      status: 500,
+    });
   }
 
-  const admin = createClient(
-    supabaseUrl,
-    serviceRoleKey,
-  );
+  const admin = createClient(supabaseUrl, serviceRoleKey);
 
   let updated = 0;
   let daily = 0;
@@ -92,17 +25,14 @@ serve(async () => {
   while (true) {
     const { data: submissions, error } = await admin
       .from("dummy_submissions")
-      .select("id, team, constellations, refinements")
+      .select("id, team, constellations, refinements, weapons")
       .neq("image_path", "pending")
       .not("image_path", "is", null)
       .is("puzzle_pool", null)
       .limit(250);
 
     if (error) {
-      return new Response(
-        JSON.stringify({ error: error.message }),
-        { status: 500 },
-      );
+      return new Response(JSON.stringify({ error: error.message }), { status: 500 });
     }
 
     if (!submissions || submissions.length === 0) {
@@ -110,10 +40,11 @@ serve(async () => {
     }
 
     for (const submission of submissions) {
-      const mode = determineSubmissionMode(
+      const mode = determinePool(
         submission.team ?? [],
         submission.constellations ?? [],
         submission.refinements ?? [],
+        submission.weapons ?? [],
       );
 
       const { error: updateError } = await admin

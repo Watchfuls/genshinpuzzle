@@ -18,3 +18,8 @@ entrypoint = "./functions/get_random_puzzle/index.ts"
 enabled = true
 verify_jwt = false
 entrypoint = "./functions/get_daily_puzzle/index.ts"
+
+[functions.manage_dummy_submission]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/manage_dummy_submission/index.ts"

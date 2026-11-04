@@ -1,0 +1,518 @@
+{
+  "Aino": {
+    "weapon": "Claymore",
+    "region": "Nod-Krai"
+  },
+  "Albedo": {
+    "weapon": "Sword",
+    "region": "Mondstadt"
+  },
+  "Alhaitham": {
+    "weapon": "Sword",
+    "region": "Sumeru"
+  },
+  "Aloy": {
+    "weapon": "Bow",
+    "region": "None"
+  },
+  "Alyosha": {
+    "weapon": "Polearm",
+    "region": "Snezhnaya"
+  },
+  "Amber": {
+    "weapon": "Bow",
+    "region": "Mondstadt"
+  },
+  "Arataki Itto": {
+    "weapon": "Claymore",
+    "region": "Inazuma"
+  },
+  "Arlecchino": {
+    "weapon": "Polearm",
+    "region": "Snezhnaya"
+  },
+  "Baizhu": {
+    "weapon": "Catalyst",
+    "region": "Liyue"
+  },
+  "Barbara": {
+    "weapon": "Catalyst",
+    "region": "Mondstadt"
+  },
+  "Beidou": {
+    "weapon": "Claymore",
+    "region": "Liyue"
+  },
+  "Bennett": {
+    "weapon": "Sword",
+    "region": "Mondstadt"
+  },
+  "Candace": {
+    "weapon": "Polearm",
+    "region": "Sumeru"
+  },
+  "Charlotte": {
+    "weapon": "Catalyst",
+    "region": "Fontaine"
+  },
+  "Chasca": {
+    "weapon": "Bow",
+    "region": "Natlan"
+  },
+  "Chevreuse": {
+    "weapon": "Polearm",
+    "region": "Fontaine"
+  },
+  "Chiori": {
+    "weapon": "Sword",
+    "region": "Inazuma"
+  },
+  "Chongyun": {
+    "weapon": "Claymore",
+    "region": "Liyue"
+  },
+  "Citlali": {
+    "weapon": "Catalyst",
+    "region": "Natlan"
+  },
+  "Clorinde": {
+    "weapon": "Sword",
+    "region": "Fontaine"
+  },
+  "Collei": {
+    "weapon": "Bow",
+    "region": "Sumeru"
+  },
+  "Columbina": {
+    "weapon": "Catalyst",
+    "region": "Nod-Krai"
+  },
+  "Cyno": {
+    "weapon": "Polearm",
+    "region": "Sumeru"
+  },
+  "Dahlia": {
+    "weapon": "Sword",
+    "region": "Mondstadt"
+  },
+  "Dehya": {
+    "weapon": "Claymore",
+    "region": "Sumeru"
+  },
+  "Diluc": {
+    "weapon": "Claymore",
+    "region": "Mondstadt"
+  },
+  "Diona": {
+    "weapon": "Bow",
+    "region": "Mondstadt"
+  },
+  "Dori": {
+    "weapon": "Claymore",
+    "region": "Sumeru"
+  },
+  "Durin": {
+    "weapon": "Sword",
+    "region": "Mondstadt"
+  },
+  "Emilie": {
+    "weapon": "Polearm",
+    "region": "Fontaine"
+  },
+  "Escoffier": {
+    "weapon": "Polearm",
+    "region": "Fontaine"
+  },
+  "Eula": {
+    "weapon": "Claymore",
+    "region": "Mondstadt"
+  },
+  "Faruzan": {
+    "weapon": "Bow",
+    "region": "Sumeru"
+  },
+  "Fischl": {
+    "weapon": "Bow",
+    "region": "Mondstadt"
+  },
+  "Flins": {
+    "weapon": "Polearm",
+    "region": "Nod-Krai"
+  },
+  "Freminet": {
+    "weapon": "Claymore",
+    "region": "Fontaine"
+  },
+  "Furina": {
+    "weapon": "Sword",
+    "region": "Fontaine"
+  },
+  "Gaming": {
+    "weapon": "Claymore",
+    "region": "Liyue"
+  },
+  "Ganyu": {
+    "weapon": "Bow",
+    "region": "Liyue"
+  },
+  "Gorou": {
+    "weapon": "Bow",
+    "region": "Inazuma"
+  },
+  "Hu Tao": {
+    "weapon": "Polearm",
+    "region": "Liyue"
+  },
+  "Iansan": {
+    "weapon": "Polearm",
+    "region": "Natlan"
+  },
+  "Ifa": {
+    "weapon": "Catalyst",
+    "region": "Natlan"
+  },
+  "Illuga": {
+    "weapon": "Polearm",
+    "region": "Nod-Krai"
+  },
+  "Ineffa": {
+    "weapon": "Polearm",
+    "region": "Nod-Krai"
+  },
+  "Jahoda": {
+    "weapon": "Bow",
+    "region": "Nod-Krai"
+  },
+  "Jean": {
+    "weapon": "Sword",
+    "region": "Mondstadt"
+  },
+  "Kachina": {
+    "weapon": "Polearm",
+    "region": "Natlan"
+  },
+  "Kaedehara Kazuha": {
+    "weapon": "Sword",
+    "region": "Inazuma"
+  },
+  "Kaeya": {
+    "weapon": "Sword",
+    "region": "Mondstadt"
+  },
+  "Kamisato Ayaka": {
+    "weapon": "Sword",
+    "region": "Inazuma"
+  },
+  "Kamisato Ayato": {
+    "weapon": "Sword",
+    "region": "Inazuma"
+  },
+  "Kaveh": {
+    "weapon": "Claymore",
+    "region": "Sumeru"
+  },
+  "Keqing": {
+    "weapon": "Sword",
+    "region": "Liyue"
+  },
+  "Kinich": {
+    "weapon": "Claymore",
+    "region": "Natlan"
+  },
+  "Kirara": {
+    "weapon": "Sword",
+    "region": "Inazuma"
+  },
+  "Klee": {
+    "weapon": "Catalyst",
+    "region": "Mondstadt"
+  },
+  "Kujou Sara": {
+    "weapon": "Bow",
+    "region": "Inazuma"
+  },
+  "Kuki Shinobu": {
+    "weapon": "Sword",
+    "region": "Inazuma"
+  },
+  "Lan Yan": {
+    "weapon": "Catalyst",
+    "region": "Liyue"
+  },
+  "Lauma": {
+    "weapon": "Catalyst",
+    "region": "Nod-Krai"
+  },
+  "Layla": {
+    "weapon": "Sword",
+    "region": "Sumeru"
+  },
+  "Linnea": {
+    "weapon": "Bow",
+    "region": "Nod-Krai"
+  },
+  "Lisa": {
+    "weapon": "Catalyst",
+    "region": "Mondstadt"
+  },
+  "Lohen": {
+    "weapon": "Polearm",
+    "region": "Mondstadt"
+  },
+  "Lynette": {
+    "weapon": "Sword",
+    "region": "Fontaine"
+  },
+  "Lyney": {
+    "weapon": "Bow",
+    "region": "Fontaine"
+  },
+  "Mavuika": {
+    "weapon": "Claymore",
+    "region": "Natlan"
+  },
+  "Mika": {
+    "weapon": "Polearm",
+    "region": "Mondstadt"
+  },
+  "Mitya": {
+    "weapon": "Catalyst",
+    "region": "Snezhnaya"
+  },
+  "Mona": {
+    "weapon": "Catalyst",
+    "region": "Mondstadt"
+  },
+  "Mualani": {
+    "weapon": "Catalyst",
+    "region": "Natlan"
+  },
+  "Nahida": {
+    "weapon": "Catalyst",
+    "region": "Sumeru"
+  },
+  "Navia": {
+    "weapon": "Claymore",
+    "region": "Fontaine"
+  },
+  "Nefer": {
+    "weapon": "Catalyst",
+    "region": "Nod-Krai"
+  },
+  "Neuvillette": {
+    "weapon": "Catalyst",
+    "region": "Fontaine"
+  },
+  "Nicole": {
+    "weapon": "Catalyst",
+    "region": "None"
+  },
+  "Nilou": {
+    "weapon": "Sword",
+    "region": "Sumeru"
+  },
+  "Ningguang": {
+    "weapon": "Catalyst",
+    "region": "Liyue"
+  },
+  "Noelle": {
+    "weapon": "Claymore",
+    "region": "Mondstadt"
+  },
+  "Odette": {
+    "weapon": "Sword",
+    "region": "Snezhnaya"
+  },
+  "Ororon": {
+    "weapon": "Bow",
+    "region": "Natlan"
+  },
+  "Prune": {
+    "weapon": "Catalyst",
+    "region": "Mondstadt"
+  },
+  "Qiqi": {
+    "weapon": "Sword",
+    "region": "Liyue"
+  },
+  "Raiden Shogun": {
+    "weapon": "Polearm",
+    "region": "Inazuma"
+  },
+  "Razor": {
+    "weapon": "Claymore",
+    "region": "Mondstadt"
+  },
+  "Rosaria": {
+    "weapon": "Polearm",
+    "region": "Mondstadt"
+  },
+  "Sandrone": {
+    "weapon": "Claymore",
+    "region": "Snezhnaya"
+  },
+  "Sangonomiya Kokomi": {
+    "weapon": "Catalyst",
+    "region": "Inazuma"
+  },
+  "Sayu": {
+    "weapon": "Claymore",
+    "region": "Inazuma"
+  },
+  "Sethos": {
+    "weapon": "Bow",
+    "region": "Sumeru"
+  },
+  "Shenhe": {
+    "weapon": "Polearm",
+    "region": "Liyue"
+  },
+  "Shikanoin Heizou": {
+    "weapon": "Catalyst",
+    "region": "Inazuma"
+  },
+  "Sigewinne": {
+    "weapon": "Bow",
+    "region": "Fontaine"
+  },
+  "Skirk": {
+    "weapon": "Sword",
+    "region": "None"
+  },
+  "Sucrose": {
+    "weapon": "Catalyst",
+    "region": "Mondstadt"
+  },
+  "Tartaglia": {
+    "weapon": "Bow",
+    "region": "Snezhnaya"
+  },
+  "Thoma": {
+    "weapon": "Polearm",
+    "region": "Inazuma"
+  },
+  "Tighnari": {
+    "weapon": "Bow",
+    "region": "Sumeru"
+  },
+  "Traveler (Anemo)": {
+    "weapon": "Sword",
+    "region": "None"
+  },
+  "Traveler (Cryo)": {
+    "weapon": "Sword",
+    "region": "None"
+  },
+  "Traveler (Dendro)": {
+    "weapon": "Sword",
+    "region": "None"
+  },
+  "Traveler (Electro)": {
+    "weapon": "Sword",
+    "region": "None"
+  },
+  "Traveler (Geo)": {
+    "weapon": "Sword",
+    "region": "None"
+  },
+  "Traveler (Hydro)": {
+    "weapon": "Sword",
+    "region": "None"
+  },
+  "Traveler (Pyro)": {
+    "weapon": "Sword",
+    "region": "None"
+  },
+  "Valeriy": {
+    "weapon": "Sword",
+    "region": "Snezhnaya"
+  },
+  "Varesa": {
+    "weapon": "Catalyst",
+    "region": "Natlan"
+  },
+  "Varka": {
+    "weapon": "Claymore",
+    "region": "Mondstadt"
+  },
+  "Venti": {
+    "weapon": "Bow",
+    "region": "Mondstadt"
+  },
+  "Vesna": {
+    "weapon": "Sword",
+    "region": "Snezhnaya"
+  },
+  "Vodyanitsa": {
+    "weapon": "Catalyst",
+    "region": "Snezhnaya"
+  },
+  "Wanderer": {
+    "weapon": "Catalyst",
+    "region": "Sumeru"
+  },
+  "Wriothesley": {
+    "weapon": "Catalyst",
+    "region": "Fontaine"
+  },
+  "Xiangling": {
+    "weapon": "Polearm",
+    "region": "Liyue"
+  },
+  "Xianyun": {
+    "weapon": "Catalyst",
+    "region": "Liyue"
+  },
+  "Xiao": {
+    "weapon": "Polearm",
+    "region": "Liyue"
+  },
+  "Xilonen": {
+    "weapon": "Sword",
+    "region": "Natlan"
+  },
+  "Xingqiu": {
+    "weapon": "Sword",
+    "region": "Liyue"
+  },
+  "Xinyan": {
+    "weapon": "Claymore",
+    "region": "Liyue"
+  },
+  "Yae Miko": {
+    "weapon": "Catalyst",
+    "region": "Inazuma"
+  },
+  "Yanfei": {
+    "weapon": "Catalyst",
+    "region": "Liyue"
+  },
+  "Yaoyao": {
+    "weapon": "Polearm",
+    "region": "Liyue"
+  },
+  "Yelan": {
+    "weapon": "Bow",
+    "region": "Liyue"
+  },
+  "Yoimiya": {
+    "weapon": "Bow",
+    "region": "Inazuma"
+  },
+  "Yumemizuki Mizuki": {
+    "weapon": "Catalyst",
+    "region": "Inazuma"
+  },
+  "Yun Jin": {
+    "weapon": "Polearm",
+    "region": "Liyue"
+  },
+  "Zhongli": {
+    "weapon": "Polearm",
+    "region": "Liyue"
+  },
+  "Zibai": {
+    "weapon": "Sword",
+    "region": "Liyue"
+  }
+}
