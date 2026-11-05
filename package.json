@@ -18,7 +18,8 @@
     "prepare": "lefthook install",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "generate:elements": "deno run -A scripts/generate_character_elements.ts"
+    "generate:elements": "deno run -A scripts/generate_character_elements.ts",
+    "test": "deno test tests"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",

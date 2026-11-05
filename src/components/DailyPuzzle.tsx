@@ -14,6 +14,7 @@ import AdvancedRosterFilters from "./AdvancedRosterFilters";
 import { compareCharacters, characterRarity } from "../game/roster";
 import { useSettings } from "../context/SettingsContext";
 import { getGenshinVersion } from "../game/genshinVersions";
+import { nextDailyPuzzleDate } from "../game/dailyNavigation";
 
 type Props = { mode?: "daily" | "endless" };
 
@@ -339,12 +340,8 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
 
       const earlier = new Date(selectedDate + "T00:00:00Z");
       earlier.setUTCDate(earlier.getUTCDate() - 1);
-      const later = new Date(selectedDate + "T00:00:00Z");
-      later.setUTCDate(later.getUTCDate() + 1);
       setPrevDate(isEndless ? null : earlier.toISOString().slice(0, 10));
-      setNextDate(
-        !isEndless && selectedDate < todayUTC() ? later.toISOString().slice(0, 10) : null,
-      );
+      setNextDate(isEndless ? null : nextDailyPuzzleDate(selectedDate, todayUTC()));
 
       setLoadedPuzzleId(null);
       setIsDateLoading(true);
@@ -435,7 +432,7 @@ export default function DailyPuzzle({ mode = "daily" }: Props) {
 
         if (!isEndless) {
           setPrevDate(row.prev_date ?? null);
-          setNextDate(row.next_date ?? null);
+          setNextDate(nextDailyPuzzleDate(selectedDate, todayUTC(), row.next_date));
         } else {
           setPrevDate(null);
           setNextDate(null);
